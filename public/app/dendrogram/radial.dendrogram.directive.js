@@ -7,9 +7,7 @@
       restrict: 'E',
       replace: true,
       template: '<div class="dendrogram"></div>',
-      scope: {
-        data: '='
-      },
+      scope: { filter: '=' },
       link: drawTreeOfLife,
       controller: 'DendrogramController',
       controllerAs: 'vm',
@@ -18,31 +16,106 @@
   }
 
   function drawTreeOfLife($scope, $element, $attr) {
+    // Let's try defining the data here
+    var data = {
+      "name": "Chordata",
+      "children": [
+        {
+          "name": "Mammalia",
+          "children": [
+            {"name": "Primate",
+              "children": [
+                {
+                  "name": "Lemuridae",
+                  "children": [
+                    {
+                      "name": "Lemur",
+                      "children": [
+                        {
+                          "name": "Ring-tailed Lemur",
+                          "habitat": "jungle"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Catarrhini",
+                  "children": [
+                    {"name": "Cercopithecoidea"},
+                    {
+                      "name": "Hominoidea",
+                      "children": [
+                        {"name": "Ponginae"},
+                        {"name": "Gorillinae"},
+                        {
+                          "name": "Homininae",
+                          "habitat": "Hey, that's me!"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {"name": "Lorisiformes"}
+              ]
+            },
+            {"name": "Marsupialia"},
+            {"name": "Cetacea"},
+            {"name": "Proboscidea"}
+          ]
+        },
+        {
+          "name": "Aves",
+          "children": [
+            {"name": "Struthioniformes",
+              "children": [
+                {"name": "Emu"},
+                {"name": "Ostrich"},
+                {"name": "Kiwi"}
+              ]},
+            {"name": "Turniciformes"},
+            {"name": "Piciformes"}
+          ]},
+        {"name": "Reptilia"}
+      ]
+    }
+
     /***** Initialization ****/
-
     var tooltip = dendrogramService.initializeTooltip()
-
-    var diameter = 1250;
-
+    var diameter = 600
     var viz = d3.select($element[0]).append("svg")
         .attr("width", diameter)
         .attr("height", diameter)
         .append("g")
         .attr("transform", "translate(" + diameter / 3 + "," + diameter / 2 + ")");
-
     var tree = d3.layout.tree()
         .size([360, diameter / 3-1])
         .separation(function(a, b) { return (a.parent == b.parent ? 2: 1) / a.depth; });
-
     var diagonal = d3.svg.diagonal.radial()
         .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-    d3.json("/treeData.json", function(error, data) {
-      if (error) throw error;
-      visualizeIt(data);
-    });
+    /***** Execution ****/
+    $scope.$watch('vm.filter', function (newVal, oldVal) {
+      // console.log('change', newVal);
+      if (newVal) {
+        var filter = newVal
 
-    function visualizeIt(treeData){
+        // Draw the visualization
+        visualizeIt(data, filter)
+
+        // Select the nodes that match the filter and modify them
+        d3.selectAll('circle')
+        .attr("r", function(d) {
+          if  (d.habitat === filter) {
+            return 20
+          }
+          return 6
+        })
+      }
+
+    })
+    
+    function visualizeIt(treeData, filter) {
       var nodes = tree.nodes(treeData),
           links = tree.links(nodes);
 
@@ -95,17 +168,31 @@
           })
 
       node.append("circle")
-          .attr("r", 6);
+          .attr("r", 6)
 
       node.append("text")
           .attr("dy", 3)
           .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
           .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
           .text(function(d) { return d.name; })
+          .attr('class', 'node-name')
+
+
+      // Apply filter
+      // d3.select('.node-name')
+      //   .style("opacity", function(d) {
+      //     console.log('evaluate text opacity');
+      //     console.log(d.habitat === filter);
+      //     if (d.habitat === filter) {
+      //       return 1
+      //     } else {
+      //       return 0.1
+      //     }
+      //   })
 
     }
 
+    d3.select(self.frameElement).style("height", diameter - 10 + "px");
 
-      d3.select(self.frameElement).style("height", diameter - 10 + "px");
- };
-})();
+ }
+})()
