@@ -8,7 +8,8 @@ var dendrogramService = {
   initializeSvg: initializeSvg,
   initializeTree: initializeTree,
   diagonal: diagonal,
-  initializeTooltip: initializeTooltip
+  initializeTooltip: initializeTooltip,
+  getData: getData
 }
 
 /*** Implementation ***/
@@ -46,4 +47,72 @@ function initializeTooltip() {
   return d3.select("body").append("div")
    .attr("class", "tooltip")
    .style("opacity", 0);
+}
+
+function getData() {
+  return {
+    "name": "Chordata",
+    "children": [
+      {
+        "name": "Mammalia",
+        "children": [
+          {"name": "Primate",
+            "children": [
+              {
+                "name": "Lemuridae",
+                "children": [
+                  {
+                    "name": "Lemur",
+                    "children": [
+                      {
+                        "name": "Ring-tailed Lemur",
+                        "habitat": "jungle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Catarrhini",
+                "children": [
+                  {"name": "Cercopithecoidea"},
+                  {
+                    "name": "Hominoidea",
+                    "children": [
+                      {"name": "Ponginae"},
+                      {"name": "Gorillinae"},
+                      {
+                        "name": "Homininae",
+                        "habitat": "jungle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {"name": "Lorisiformes"}
+            ]
+          },
+          {"name": "Marsupialia"},
+          {
+            "name": "Cetacea",
+            "habitat": "ocean"
+          },
+          {"name": "Proboscidea"}
+        ]
+      },
+      {
+        "name": "Aves",
+        "children": [
+          {"name": "Struthioniformes",
+            "children": [
+              {"name": "Emu"},
+              {"name": "Ostrich"},
+              {"name": "Kiwi"}
+            ]},
+          {"name": "Turniciformes"},
+          {"name": "Piciformes"}
+        ]},
+      {"name": "Reptilia"}
+    ]
+  }
 }

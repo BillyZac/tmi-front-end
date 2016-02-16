@@ -19,73 +19,6 @@
   }
 
   function drawTreeOfLife($scope, $element, $attr) {
-    // Let's try defining the data here
-    var data = {
-      "name": "Chordata",
-      "children": [
-        {
-          "name": "Mammalia",
-          "children": [
-            {"name": "Primate",
-              "children": [
-                {
-                  "name": "Lemuridae",
-                  "children": [
-                    {
-                      "name": "Lemur",
-                      "children": [
-                        {
-                          "name": "Ring-tailed Lemur",
-                          "habitat": "jungle"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Catarrhini",
-                  "children": [
-                    {"name": "Cercopithecoidea"},
-                    {
-                      "name": "Hominoidea",
-                      "children": [
-                        {"name": "Ponginae"},
-                        {"name": "Gorillinae"},
-                        {
-                          "name": "Homininae",
-                          "habitat": "jungle"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {"name": "Lorisiformes"}
-              ]
-            },
-            {"name": "Marsupialia"},
-            {
-              "name": "Cetacea",
-              "habitat": "ocean"
-            },
-            {"name": "Proboscidea"}
-          ]
-        },
-        {
-          "name": "Aves",
-          "children": [
-            {"name": "Struthioniformes",
-              "children": [
-                {"name": "Emu"},
-                {"name": "Ostrich"},
-                {"name": "Kiwi"}
-              ]},
-            {"name": "Turniciformes"},
-            {"name": "Piciformes"}
-          ]},
-        {"name": "Reptilia"}
-      ]
-    }
-
     /***** Initialization ****/
     var tooltip = dendrogramService.initializeTooltip()
     var diameter = 600
@@ -101,6 +34,8 @@
         .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
     /***** Execution ****/
+    var data = dendrogramService.getData()
+
     // Inital rendering, with no filter
     visualizeIt(data)
 
@@ -108,16 +43,15 @@
     $scope.$watch('vm.habitat', function (newVal, oldVal) {
       if (newVal) {
         var selectedHabitat = newVal
-
-        // Draw the visualization
-        visualizeIt(data)
-
+        var filterOptions = {
+          habitat: newVal
+        }
         // Select the nodes that match the filter and modify them
         d3.selectAll('circle')
           .transition()
           .duration(150)
           .attr("r", function(d) {
-            if  (d.habitat === selectedHabitat) {
+            if  (matchFilter(d, filterOptions)) {
               return 10
             }
             return 6
@@ -127,7 +61,7 @@
           .transition()
           .duration(150)
           .style('opacity', function(d) {
-            if  (d.habitat === selectedHabitat) {
+            if  (matchFilter(d, filterOptions)) {
               return 1
             }
             return 0.1
@@ -201,5 +135,15 @@
 
     d3.select(self.frameElement).style("height", diameter - 10 + "px");
 
+ }
+
+ function matchFilter(d, filterOptions) {
+   if (
+     d.habitat === filterOptions.habitat &&
+     true // put another criteria here
+   ) {
+     return true
+   }
+   return false
  }
 })()
