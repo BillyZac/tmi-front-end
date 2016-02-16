@@ -7,7 +7,10 @@
       restrict: 'E',
       replace: true,
       template: '<div class="dendrogram"></div>',
-      scope: { filter: '=' },
+      scope: {
+        filter: '=',
+        habitat: '='
+       },
       link: drawTreeOfLife,
       controller: 'DendrogramController',
       controllerAs: 'vm',
@@ -50,7 +53,7 @@
                         {"name": "Gorillinae"},
                         {
                           "name": "Homininae",
-                          "habitat": "Hey, that's me!"
+                          "habitat": "jungle"
                         }
                       ]
                     }
@@ -60,7 +63,10 @@
               ]
             },
             {"name": "Marsupialia"},
-            {"name": "Cetacea"},
+            {
+              "name": "Cetacea",
+              "habitat": "ocean"
+            },
             {"name": "Proboscidea"}
           ]
         },
@@ -95,27 +101,42 @@
         .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
     /***** Execution ****/
-    $scope.$watch('vm.filter', function (newVal, oldVal) {
-      // console.log('change', newVal);
+    // Inital rendering, with no filter
+    visualizeIt(data)
+
+    // Watch habitat and update visualization on change
+    $scope.$watch('vm.habitat', function (newVal, oldVal) {
       if (newVal) {
-        var filter = newVal
+        var selectedHabitat = newVal
 
         // Draw the visualization
-        visualizeIt(data, filter)
+        visualizeIt(data)
 
         // Select the nodes that match the filter and modify them
         d3.selectAll('circle')
-        .attr("r", function(d) {
-          if  (d.habitat === filter) {
-            return 20
-          }
-          return 6
-        })
+          .transition()
+          .duration(150)
+          .attr("r", function(d) {
+            if  (d.habitat === selectedHabitat) {
+              return 10
+            }
+            return 6
+          })
+        // Modify the appearance of the text as well
+        d3.selectAll('.node-name')
+          .transition()
+          .duration(150)
+          .style('opacity', function(d) {
+            if  (d.habitat === selectedHabitat) {
+              return 1
+            }
+            return 0.1
+          })
       }
 
     })
-    
-    function visualizeIt(treeData, filter) {
+
+    function visualizeIt(treeData) {
       var nodes = tree.nodes(treeData),
           links = tree.links(nodes);
 
@@ -140,7 +161,6 @@
           .attr("class", "node")
           .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
           .on("mouseover", function(d){
-            console.log(d)
             tooltip
               .transition()
               .duration(500)
@@ -175,21 +195,8 @@
           .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
           .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
           .text(function(d) { return d.name; })
+          .style('opacity', 0.1)
           .attr('class', 'node-name')
-
-
-      // Apply filter
-      // d3.select('.node-name')
-      //   .style("opacity", function(d) {
-      //     console.log('evaluate text opacity');
-      //     console.log(d.habitat === filter);
-      //     if (d.habitat === filter) {
-      //       return 1
-      //     } else {
-      //       return 0.1
-      //     }
-      //   })
-
     }
 
     d3.select(self.frameElement).style("height", diameter - 10 + "px");

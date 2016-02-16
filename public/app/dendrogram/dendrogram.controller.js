@@ -5,6 +5,7 @@
   function DendrogramController($scope) {
     var vm = this
     vm.data = 'whatever'
-    vm.filter = 'no filter'
+    vm.filter = ''
+    vm.habitat = ''
   }
 })()
