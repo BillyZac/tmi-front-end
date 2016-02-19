@@ -6,6 +6,8 @@
 
 .bookmark {
   margin: 10px 0;
+  color: white;
+  cursor: pointer;
 }
 
 .bookmark span {

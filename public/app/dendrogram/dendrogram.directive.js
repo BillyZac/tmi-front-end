@@ -206,9 +206,9 @@
           "<h3>" + d.name + "</h3>" +
           "<p>" +  d.description + "</p>" +
           "<div>" +
-            '<img src="http://lorempixel.com/100/100/animals/">' +
+            '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Apteryx_haastii.jpg/100px-Apteryx_haastii.jpg">' +
           '</div>' +
-          '<a href="' + d.references + '">More...' + '</a>'
+          '<a href="' + 'https://en.wikipedia.org/wiki/Southern_brown_kiwi' + '">More...' + '</a>'
         )
       }
     }
